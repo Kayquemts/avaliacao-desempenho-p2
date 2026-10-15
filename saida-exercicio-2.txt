@@ -1,0 +1,92 @@
+==========================================================================
+EXERCÍCIO 2 - Balanceamento do I/O das queries entre os dois discos
+==========================================================================
+
+[0] VALIDAÇÃO contra o livro
+  Base (Tab. 6.3):  X_u=0.409 (0,409) X_q=4.094 (4,093) R_u=2.443 (2,444) R_q=0.733 (0,733)
+  Util. base (Tab. 6.4): CPU=58.34 (58,31) D1=93.34 (93,3) D2=9.82 (9,81)
+  Cenário C (Seção 6.4, tudo no Disco 2): X_q=4.334 (4,335) X_u=0.517 (0,517) R_q=0.692 (0,692) R_u=1.933 (1,934)
+
+--------------------------------------------------------------------------
+[1] SITUAÇÃO ATUAL (queries só no Disco 1)
+--------------------------------------------------------------------------
+
+  Resultados - MVA exato, N=(1,3)
+  Demandas (s): Update = [0.375, 0.48, 0.24] | Query = [0.105, 0.18, 0.0]
+  Classe     X0 (tps)     R (s)
+  Update       0.4093    2.4430
+  Query        4.0939    0.7328
+  Resposta média global (ponderada por X0): 0.8883 s
+  Utilização (%)     Update    Query    Total
+  CPU                 15.35    42.99    58.34
+  Disco 1             19.65    73.69    93.34
+  Disco 2              9.82     0.00     9.82
+  Gargalo (maior utilização): Disco 1 (93.34 %)
+  Residência (%)     Update    Query      (R'_{i,r} / R_r x 100)
+  CPU                  28.8     27.8
+  Disco 1              61.4     72.2
+  Disco 2               9.8      0.0
+  Fila média n_i,r   Update    Query
+  CPU                0.2880   0.8336
+  Disco 1            0.6138   2.1664
+  Disco 2            0.0982   0.0000
+
+--------------------------------------------------------------------------
+[2] I/O DAS QUERIES BALANCEADO (50% Disco 1 / 50% Disco 2)
+--------------------------------------------------------------------------
+
+  Resultados - MVA exato, N=(1,3)
+  Demandas (s): Update = [0.375, 0.48, 0.24] | Query = [0.105, 0.09, 0.09]
+  Classe     X0 (tps)     R (s)
+  Update       0.4561    2.1924
+  Query        5.2465    0.5718
+  Resposta média global (ponderada por X0): 0.7014 s
+  Utilização (%)     Update    Query    Total
+  CPU                 17.10    55.09    72.19
+  Disco 1             21.89    47.22    69.11
+  Disco 2             10.95    47.22    58.17
+  Gargalo (maior utilização): CPU (72.19 %)
+  Residência (%)     Update    Query      (R'_{i,r} / R_r x 100)
+  CPU                  37.0     38.9
+  Disco 1              42.0     33.0
+  Disco 2              21.0     28.1
+  Fila média n_i,r   Update    Query
+  CPU                0.3696   1.1681
+  Disco 1            0.4203   0.9902
+  Disco 2            0.2101   0.8417
+
+--------------------------------------------------------------------------
+[3] COMPARAÇÃO  balanceado x situação atual
+--------------------------------------------------------------------------
+
+  Medida                            Base  Balanceado  Variação %
+  X0 Update (tps)                 0.4093      0.4561      +11.43
+  X0 Query (tps)                  4.0939      5.2465      +28.16
+  R  Update (s)                   2.4430      2.1924      -10.26
+  R  Query (s)                    0.7328      0.5718      -21.97
+  Resposta média global (s)       0.8883      0.7014      -21.03
+  Vazão total (tps)               4.5032      5.7026      +26.63
+  U CPU (%)                      58.3358     72.1930      +23.75
+  U Disco 1 (%)                  93.3379     69.1125      -25.95
+  U Disco 2 (%)                   9.8240     58.1656     +492.08
+
+  Verificações de consistência:
+  [base      ] Little N_r=X_r*R_r: True | U_i<1: True | soma das filas = população: True
+  [balanceado] Little N_r=X_r*R_r: True | U_i<1: True | soma das filas = população: True
+
+--------------------------------------------------------------------------
+[4] COMPLEMENTO: varredura da fração p do I/O das queries enviada ao Disco 2
+--------------------------------------------------------------------------
+      p    X_upd    X_qry    R_upd    R_qry  R_médio   U_D1 %   U_D2 %
+    0.0   0.4093   4.0939   2.4430   0.7328   0.8883    93.34     9.82
+    0.1   0.4151   4.3872   2.4092   0.6838   0.8329    91.00    17.86
+    0.2   0.4225   4.6783   2.3669   0.6413   0.7842    87.65    26.98
+    0.3   0.4318   4.9409   2.3157   0.6072   0.7445    82.98    37.04
+    0.4   0.4432   5.1412   2.2565   0.5835   0.7163    76.80    47.65
+    0.5   0.4561   5.2465   2.1924   0.5718   0.7014    69.11    58.17
+    0.6   0.4700   5.2366   2.1278   0.5729   0.7009    60.26    67.83
+    0.7   0.4837   5.1126   2.0673   0.5868   0.7148    50.83    76.03
+    0.8   0.4965   4.8974   2.0141   0.6126   0.7416    41.46    82.44
+    0.9   0.5077   4.6261   1.9695   0.6485   0.7791    32.70    87.13
+    1.0   0.5173   4.3337   1.9333   0.6923   0.8246    24.83    90.42
+  Menor resposta média global na grade testada: p = 0.6 (R_médio = 0.7009 s)

@@ -1,0 +1,101 @@
+==========================================================================
+EXERCÍCIO 3 - Modelo misto (Q, U abertas; I fechada) - biblioteca LINE
+==========================================================================
+
+(a) CENÁRIO BASE: lambda_Q = 3,0 ; lambda_U = 1,5 ; M = 50 terminais ; Z = 15 s
+
+  Resultados (LINE / SolverMVA exato)
+  Classe    X0 (tps)     R (s)
+  Q           3.0000    0.2872
+  U           1.5000    0.4362
+  I           3.2689    0.2957   (R + Z = 15.2957 s)
+  Utilização %         Q       U       I    Total
+  CPU              18.00   15.00   29.42    62.42
+  D1                9.00    4.50   14.71    28.21
+  D2               18.00   13.50    0.00    31.50
+  [base] X_aberta=lambda: True | U=X*D: True | U_i<1: True | Little M=X(Z+R): True | R(estações)=R(sistema): True
+
+(b) lambda_Q AUMENTADA EM 95%: 3.0 -> 5.85 tps
+
+  Resultados (LINE / SolverMVA exato)
+  Classe    X0 (tps)     R (s)
+  Q           5.8500    0.4426
+  U           1.5000    0.6868
+  I           3.2303    0.4784   (R + Z = 15.4784 s)
+  Utilização %         Q       U       I    Total
+  CPU              35.10   15.00   29.07    79.17
+  D1               17.55    4.50   14.54    36.59
+  D2               35.10   13.50    0.00    48.60
+
+  Medida              Base (a)  lambda_Q+95%  Variação %
+  R_Q (s)              0.2872        0.4426      +54.13
+  R_U (s)              0.4362        0.6868      +57.44
+  R_I (s)              0.2957        0.4784      +61.80
+  X_I (tps)             3.2689        3.2303       -1.18
+  [b] X_aberta=lambda: True | U=X*D: True | U_i<1: True | Little M=X(Z+R): True | R(estações)=R(sistema): True
+
+(c) UPGRADES sobre o cenário (b)
+
+  (c1) Disco D1 duas vezes mais rápido (D_D1 / 2)
+  Classe    X0 (tps)     R (s)
+  Q           5.8500    0.4147
+  U           1.5000    0.6594
+  I           3.2391    0.4366   (R + Z = 15.4366 s)
+  Utilização %         Q       U       I    Total
+  CPU              35.10   15.00   29.15    79.25
+  D1                8.77    2.25    7.29    18.31
+  D2               35.10   13.50    0.00    48.60
+  [c1] X_aberta=lambda: True | U=X*D: True | U_i<1: True | Little M=X(Z+R): True | R(estações)=R(sistema): True
+
+  (c2) CPU duas vezes mais rápida (D_CPU / 2)
+  Classe    X0 (tps)     R (s)
+  Q           5.8500    0.2141
+  U           1.5000    0.3057
+  I           3.3013    0.1453   (R + Z = 15.1453 s)
+  Utilização %         Q       U       I    Total
+  CPU              17.55    7.50   14.86    39.91
+  D1               17.55    4.50   14.86    36.91
+  D2               35.10   13.50    0.00    48.60
+  [c2] X_aberta=lambda: True | U=X*D: True | U_i<1: True | Little M=X(Z+R): True | R(estações)=R(sistema): True
+
+  Comparação dos upgrades em relação ao cenário (b) (variação % de R)
+  Medida           (b)     D1 2x   ganho %    CPU 2x   ganho %
+  R_Q (s)       0.4426    0.4147     -6.32    0.2141    -51.63
+  R_U (s)       0.6868    0.6594     -3.98    0.3057    -55.49
+  R_I (s)       0.4784    0.4366     -8.73    0.1453    -69.62
+  X_I (tps)     3.2303    3.2391     +0.27    3.3013     +2.20
+
+(d) lambda_Q = 5,85 ; CPU 2x mais rápida ; M variando de 50 a 250 terminais
+      M   R_I (s)  X_I (tps)  U_CPU %  U_D1 %  U_D2 %
+     50    0.1453     3.3013    39.91   36.91   48.60
+     60    0.1526     3.9597    42.87   39.87   48.60
+     70    0.1606     4.6172    45.83   42.83   48.60
+     80    0.1695     5.2737    48.78   45.78   48.60
+     90    0.1794     5.9291    51.73   48.73   48.60
+    100    0.1905     6.5831    54.67   51.67   48.60
+    110    0.2030     7.2354    57.61   54.61   48.60
+    120    0.2172     7.8858    60.54   57.54   48.60
+    130    0.2334     8.5339    63.45   60.45   48.60
+    140    0.2521     9.1791    66.36   63.36   48.60
+    150    0.2739     9.8206    69.24   66.24   48.60
+    160    0.2997    10.4578    72.11   69.11   48.60
+    170    0.3303    11.0892    74.95   71.95   48.60
+    180    0.3673    11.7132    77.76   74.76   48.60
+    190    0.4125    12.3276    80.52   77.52   48.60
+    200    0.4689    12.9292    83.23   80.23   48.60
+    210    0.5402    13.5133    85.86   82.86   48.60
+    220    0.6319    14.0738    88.38   85.38   48.60
+    230    0.7515    14.6018    90.76   87.76   48.60
+    240    0.9093    15.0856    92.93   89.93   48.60
+    250    1.1176    15.5110    94.85   91.85   48.60
+
+  Máximo de terminais com R_I < 1.5 s: M = 263  (R_I = 1.4848 s)
+  Com M = 264: R_I = 1.5181 s (>= 1.5 s)
+  OBS.: o limite está ACIMA do intervalo pedido (50 a 250): em todo o intervalo
+        50-250 o requisito R_I < 1.5 s é atendido (R_I(250) = 1.1176 s).
+  Gráfico salvo em: ex3_grafico_50_250.png
+  Gráfico salvo em: ex3_grafico_estendido.png
+
+==========================================================================
+Todas as verificações de consistência passaram: True
+==========================================================================
